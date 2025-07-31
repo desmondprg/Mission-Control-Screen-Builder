@@ -94,6 +94,8 @@ docker-compose up --build
 ```
 PORT=8080
 DATABASE_URL=postgres://your_user:your_password@db:5432/your_db?sslmode=disable
+TEST_DATABASE_URL=postgres://your_user:your_password@test_db:5432/test_db?sslmode=disable
+ENABLE_ANOMALIES=true
 ```
 
 ### frontend/.env
