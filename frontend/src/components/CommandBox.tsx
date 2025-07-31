@@ -1,5 +1,6 @@
 import React from "react";
 import { useStore } from "../store/useStore";
+import axios from 'axios';
 
 export function CommandBox({ id }: { id: string }) {
   const [isShowingModal, setIsShowingModal] = React.useState(false);
@@ -69,13 +70,42 @@ export function CommandBox({ id }: { id: string }) {
     return true;
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!validate()) return;
     updateProps({ status: "Sending command..." });
-    setTimeout(() => {
+
+    // ✅ Filter out params with no key
+    const filteredParams = props.params
+      .filter((p) => p.key.trim() !== "")
+      .map((p) => ({
+        key: p.key.trim(),
+        value: p.value,
+      }));
+
+    const payload = {
+      name: props.command,
+      code: props.twoFACode || "",
+      hazardous: props.isHazardous,
+      params: filteredParams,
+    };
+
+    console.log("🚀 Submitting command payload:", payload);
+
+    try {
+      await axios.post("/api/command", payload);
       updateProps({ status: "✅ Command sent successfully." });
-    }, 1000);
+    } catch (error: any) {
+      console.error("❌ Error sending command:", error?.response?.data || error.message);
+      updateProps({
+        status:
+          "❌ Failed to send command: " +
+          (error?.response?.data?.error || error.message),
+      });
+    }
   };
+
+
+
 
   const onSubmit = () => {
     if (props.confirmationRequired) {

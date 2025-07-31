@@ -26,13 +26,20 @@ import (
 // @description API for Mission Control Screen Builder Take-Home Challenge.
 // @BasePath /
 
+// Param is a single key-value input for a command
+type Param struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 // Command model
 type Command struct {
-	ID        uint   `json:"id" example:"1"`
-	Name      string `json:"name" example:"REBOOT_SYSTEM"`
-	Code      string `json:"code" example:"123456"`
-	Status    string `json:"status" example:"SUCCESS"`
-	Hazardous bool   `json:"hazardous" example:"false"`
+	ID        uint    `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name      string  `json:"name"`
+	Code      string  `json:"code"`
+	Status    string  `json:"status"`
+	Hazardous bool    `json:"hazardous"`
+	Params    []Param `json:"params" gorm:"type:jsonb"`
 }
 
 // TelemetryData is saved in DB
@@ -91,6 +98,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to run migrations:", err)
 	}
+	db.Exec("ALTER TABLE commands ADD COLUMN IF NOT EXISTS params jsonb;")
 
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -213,15 +221,22 @@ func postCommand(c echo.Context) error {
 	if cmd.Name == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "command name required"})
 	}
-	if cmd.Hazardous && len(cmd.Code) != 6 {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Hazardous commands require a 6-digit 2FA code"})
-	}
-	if !cmd.Hazardous && cmd.Code != "" && len(cmd.Code) != 6 {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "2FA code must be 6 digits"})
+
+	if cmd.Hazardous {
+		if len(cmd.Code) != 6 {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Hazardous commands require a 6-digit 2FA code"})
+		}
 	}
 
+	// Optional: reject malformed param keys
+	for _, p := range cmd.Params {
+		if p.Key == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Each parameter must have a key"})
+		}
+	}
+
+	// Simulate random failure
 	time.Sleep(1 * time.Second)
-
 	if rand.Float64() < 0.2 {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"status":  "error",
@@ -229,8 +244,15 @@ func postCommand(c echo.Context) error {
 		})
 	}
 
-	cmd.Status = "SUCCESS"
-	db.Create(cmd)
+	cmd.Status = "SUCCESS" // set status before saving
+
+	log.Printf("📦 Final command payload: %+v\n", cmd)
+
+	if err := db.Create(cmd).Error; err != nil {
+		log.Println("❌ DB ERROR:", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "failed to save command"})
+	}
+
 	return c.JSON(http.StatusOK, cmd)
 }
 
