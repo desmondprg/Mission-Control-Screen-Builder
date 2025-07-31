@@ -74,7 +74,7 @@ mission-control/
 
 ```bash
 git clone https://github.com/desmondprg/Mission-Control-Screen-Builder.git
-cd <mission-control>
+cd mission-control
 docker-compose up --build
 ```
 
