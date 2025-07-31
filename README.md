@@ -153,7 +153,7 @@ docker-compose exec backend go test -v
 To enter the PostgreSQL shell from Docker, run:
 
 ```bash
-docker exec -it dockerp-db-1 psql -U your_user -d your_db
+docker exec -it mission-control-db-1 psql -U your_user -d your_db
 ```
 
 Replace `your_user` with your PostgreSQL user (e.g., `postgres` or `myuser`), and `your_db` with the name of your database. (See your docker-compose.yml for details)
