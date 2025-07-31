@@ -1,0 +1,277 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Example telemetry message structure sent via WebSocket",
+        "title": "Mission Control API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/": {
+            "get": {
+                "description": "Returns a simple message indicating the API is running",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Default"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "Mission Control Backend is running",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/command": {
+            "post": {
+                "description": "Execute a command. Hazardous commands require a 6-digit 2FA code.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Commands"
+                ],
+                "summary": "Send command",
+                "parameters": [
+                    {
+                        "description": "Command to execute",
+                        "name": "command",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.Command"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.Command"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dashboard": {
+            "get": {
+                "description": "Retrieve all saved dashboard configurations",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get saved dashboards",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.DashboardConfig"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Save user dashboard layout and settings",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Save a dashboard configuration",
+                "parameters": [
+                    {
+                        "description": "Dashboard configuration",
+                        "name": "dashboard",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.DashboardConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.DashboardConfig"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/telemetry": {
+            "get": {
+                "description": "Returns recent telemetry readings grouped by time",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Telemetry"
+                ],
+                "summary": "Get latest telemetry data",
+                "responses": {
+                    "200": {
+                        "description": "Telemetry data",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ws/telemetry": {
+            "get": {
+                "description": "Upgrade to a WebSocket for real-time telemetry streaming. Sends JSON messages every second.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "WebSocket"
+                ],
+                "summary": "Connect to Telemetry WebSocket",
+                "responses": {
+                    "101": {
+                        "description": "WebSocket Upgrade Successful",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "200": {
+                        "description": "Example telemetry message",
+                        "schema": {
+                            "$ref": "#/definitions/main.TelemetryMessage"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.Command": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "hazardous": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "REBOOT_SYSTEM"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "SUCCESS"
+                }
+            }
+        },
+        "main.DashboardConfig": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "jsonConfig": {
+                    "type": "string",
+                    "example": "{\"layout\":[], \"components\":[]}"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Main Dashboard"
+                }
+            }
+        },
+        "main.TelemetryMessage": {
+            "description": "Example telemetry message structure sent via WebSocket",
+            "type": "object",
+            "properties": {
+                "pressure": {
+                    "type": "number",
+                    "example": 29.92
+                },
+                "status": {
+                    "type": "string",
+                    "example": "OK"
+                },
+                "temp": {
+                    "type": "number",
+                    "example": 98.6
+                },
+                "time": {
+                    "type": "string",
+                    "example": "2025-07-31T12:00:00Z"
+                },
+                "voltage": {
+                    "type": "number",
+                    "example": 3.3
+                }
+            }
+        }
+    }
+}

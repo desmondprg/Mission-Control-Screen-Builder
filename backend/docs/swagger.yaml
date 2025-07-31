@@ -1,0 +1,187 @@
+basePath: /
+definitions:
+  main.Command:
+    properties:
+      code:
+        example: "123456"
+        type: string
+      hazardous:
+        example: false
+        type: boolean
+      id:
+        example: 1
+        type: integer
+      name:
+        example: REBOOT_SYSTEM
+        type: string
+      status:
+        example: SUCCESS
+        type: string
+    type: object
+  main.DashboardConfig:
+    properties:
+      id:
+        example: 1
+        type: integer
+      jsonConfig:
+        example: '{"layout":[], "components":[]}'
+        type: string
+      name:
+        example: Main Dashboard
+        type: string
+    type: object
+  main.TelemetryMessage:
+    description: Example telemetry message structure sent via WebSocket
+    properties:
+      pressure:
+        example: 29.92
+        type: number
+      status:
+        example: OK
+        type: string
+      temp:
+        example: 98.6
+        type: number
+      time:
+        example: "2025-07-31T12:00:00Z"
+        type: string
+      voltage:
+        example: 3.3
+        type: number
+    type: object
+info:
+  contact: {}
+  description: Example telemetry message structure sent via WebSocket
+  title: Mission Control API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Returns a simple message indicating the API is running
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Mission Control Backend is running
+          schema:
+            type: string
+      summary: Health check
+      tags:
+      - Default
+  /api/command:
+    post:
+      consumes:
+      - application/json
+      description: Execute a command. Hazardous commands require a 6-digit 2FA code.
+      parameters:
+      - description: Command to execute
+        in: body
+        name: command
+        required: true
+        schema:
+          $ref: '#/definitions/main.Command'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Command'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Send command
+      tags:
+      - Commands
+  /api/dashboard:
+    get:
+      description: Retrieve all saved dashboard configurations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.DashboardConfig'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get saved dashboards
+      tags:
+      - Dashboard
+    post:
+      consumes:
+      - application/json
+      description: Save user dashboard layout and settings
+      parameters:
+      - description: Dashboard configuration
+        in: body
+        name: dashboard
+        required: true
+        schema:
+          $ref: '#/definitions/main.DashboardConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.DashboardConfig'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Save a dashboard configuration
+      tags:
+      - Dashboard
+  /api/telemetry:
+    get:
+      description: Returns recent telemetry readings grouped by time
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Telemetry data
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+      summary: Get latest telemetry data
+      tags:
+      - Telemetry
+  /ws/telemetry:
+    get:
+      description: Upgrade to a WebSocket for real-time telemetry streaming. Sends
+        JSON messages every second.
+      produces:
+      - application/json
+      responses:
+        "101":
+          description: WebSocket Upgrade Successful
+          schema:
+            type: string
+        "200":
+          description: Example telemetry message
+          schema:
+            $ref: '#/definitions/main.TelemetryMessage'
+      summary: Connect to Telemetry WebSocket
+      tags:
+      - WebSocket
+swagger: "2.0"
