@@ -31,42 +31,40 @@ Make sure you have the following installed on your system:
 
 ```
 mission-control/
-├── docker-compose.yml            # Orchestrates backend and frontend containers
+├── MissionControl_Architecture.md      # Explanation of project architecture and design decisions
+├── MissionControl_Diagram.png          # Visual diagram of system architecture
+├── README.md                           # Project overview and setup instructions
+├── docker-compose.yml                  # Docker configuration for frontend and backend services
+├── backend/
+│   ├── .env                            # Runtime environment variables (development use)
+│   ├── .env.example                    # Example env file
+│   ├── Dockerfile                      # Docker build instructions for backend
+│   ├── entrypoint.sh                   # Backend container entrypoint
+│   ├── go.mod                          # Go module definition
+│   ├── go.sum                          # Go dependencies lockfile
+│   ├── main.go                         # Main application with all API and WebSocket handlers
+│   ├── main_test.go                    # Backend unit tests
+│   └── docs/
+│       ├── docs.go                     # Auto-generated Swagger docs binding
+│       ├── swagger.json                # Swagger spec (JSON)
+│       └── swagger.yaml                # Swagger spec (YAML)
+├── frontend/
+│   ├── .env                            # Frontend runtime environment variables
+│   ├── .env.example                    # Example frontend env file
+│   ├── Dockerfile                      # Docker build for frontend
+│   ├── index.html                      # HTML entry point
+│   ├── package.json                    # Frontend dependencies
+│   ├── package-lock.json              # Dependency lock file
+│   ├── postcss.config.js              # PostCSS config
+│   ├── tailwind.config.js             # Tailwind CSS config
+│   ├── vite.config.ts                 # Vite build configuration
+│   ├── node_modules/                  # Installed node dependencies (excluded from version control)
+│   └── src/
+│       ├── components/                # React components (e.g. CommandBox, ChartBox, TelemetryBox)
+│       ├── hooks/                     # Custom React hooks
+│       ├── store/                     # Zustand state management store
+│       └── types/                     # TypeScript types and interfaces
 
-├── backend/                      # Go backend server (Echo framework)
-│   ├── main.go                  # Core backend application with all API endpoints and WebSocket
-│   ├── .env                     # Environment variables for DB connection
-│   ├── .env.example             # Sample .env config
-│   ├── Dockerfile              # Backend Dockerfile
-│   ├── entrypoint.sh           # Startup script used by container
-│   ├── go.mod                  # Go module metadata
-│   ├── go.sum                  # Dependency checksums
-│   └── docs/                   # Swagger documentation served at /swagger
-│       ├── index.html         # Swagger UI entry point
-│       └── swagger.yaml       # OpenAPI spec for REST APIs
-
-├── frontend/                     # React + Vite frontend
-│   ├── .env                     # Local frontend environment variables
-│   ├── .env.example             # Sample frontend .env file
-│   ├── Dockerfile              # Frontend Dockerfile
-│   ├── index.html              # HTML entry point for Vite
-│   ├── package.json            # NPM dependencies and scripts
-│   ├── package-lock.json       # NPM lockfile
-│   ├── tailwind.config.js      # TailwindCSS config
-│   ├── postcss.config.js       # CSS processor config
-│   ├── vite.config.ts          # Vite config for frontend build/dev
-│   └── src/                    # Application source code
-│       ├── index.css           # Global styles
-│       ├── main.tsx           # Mounts React app to DOM
-│       ├── components/         # All major UI components
-│       │   ├── App.tsx               # Main wrapper for Sidebar + Dashboard
-│       │   ├── Dashboard.tsx         # Handles grid layout and rendering of dropped components
-│       │   ├── Sidebar.tsx           # Sidebar for dragging components and adjusting settings
-│       │   ├── CommandBox.tsx        # Command form with validation and 2FA confirmation
-│       │   ├── TelemetryBox.tsx      # Real-time telemetry display with stale/threshold indicators
-│       │   └── ChartBox.tsx          # Historical telemetry chart using Recharts
-│       └── store/
-│           └── useStore.ts          # Zustand state store: layout, telemetry, user settings
 
 ```
 
