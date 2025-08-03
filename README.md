@@ -138,25 +138,13 @@ To run all backend tests inside the Docker container using the test PostgreSQL d
 docker-compose exec backend go test -v
 ```
 
-
----
-
-## 🛠 Future Ideas
-
-- Implement user auth
-- Set up CI/CD deployment
-
----
-
 ## 📂 Accessing the PostgreSQL Database
 
 To enter the PostgreSQL shell from Docker, run:
 
 ```bash
-docker exec -it mission-control-db-1 psql -U your_user -d your_db
+docker exec -it mission-control-screen-builder-db-1 psql -U your_user -d your_db
 ```
-
-Replace `your_user` with your PostgreSQL user (e.g., `postgres` or `myuser`), and `your_db` with the name of your database. (See your docker-compose.yml for details)
 
 Once inside the `psql` shell, use the following commands to explore and interact with your data:
 

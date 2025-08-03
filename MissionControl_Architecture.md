@@ -90,6 +90,14 @@ Frontend -> Show toast notification
 
 ---
 
+## 🛠 Future Ideas
+
+- Implement user auth
+- Set up CI/CD deployment
+
+---
+
+
 ## 🚀 Performance Notes & Lessons Learned
 
 ### Real-Time Performance
