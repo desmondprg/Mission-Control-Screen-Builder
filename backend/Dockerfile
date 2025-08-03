@@ -18,7 +18,7 @@ RUN go mod tidy && go build -o server .
 
 # Copy and make entrypoint executable
 COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+RUN sed -i 's/\r$//' entrypoint.sh && chmod +x entrypoint.sh
 
 EXPOSE 8080
 
